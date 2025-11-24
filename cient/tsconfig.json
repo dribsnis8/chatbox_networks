@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "esnext",         // or "es6"
+    "target": "es6",            // modern JS
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true     // allows default imports from CommonJS modules
+  },
+  "exclude": ["node_modules"]
+}
