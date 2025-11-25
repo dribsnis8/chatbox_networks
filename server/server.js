@@ -70,10 +70,20 @@ function cleanupSocket(socket) {
   removeSocket(socket, rooms, socketMap);
 }
 
-// Server upgrade event
+function handleGet(req, res) {
+  if (req.method === "GET" && req.url === "/rooms") {
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    });
+    res.end(JSON.stringify({rooms : Object.keys(rooms)}));
+  }
+}
+
 server.on("upgrade", handleUpgrade);
 
-// Start server
+server.on("request", handleGet);
+
 server.listen(3000, () => {
   console.log("Server running on port 3000");
 });

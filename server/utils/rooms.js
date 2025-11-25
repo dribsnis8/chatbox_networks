@@ -11,6 +11,11 @@ function removeSocket(socket, rooms, socketMap) {
   if (!info) return false;
 
   const { roomName, username } = info;
+
+  if (!rooms[roomName] || !rooms[roomName][username]) {
+    return false;
+  }
+
   delete rooms[roomName][username];
   socketMap.delete(socket);
 
