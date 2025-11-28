@@ -7,14 +7,20 @@
     <script src="js/joinRoom.js" type="module" defer></script>
 </head>
 <body>
-<div>
-    <label for="username">Username:</label>
-    <input type="text" id="username">
-    <label for="rooms">Room:</label>
-    <input list="rooms" id="room" name="custom-select">
-    <datalist id="rooms">
-    </datalist>
-    <button id="join">Join Chat</button>
+<div class="container">
+    <div id="loginfield">
+        <div class="inputfield">
+            <label for="username">Username:</label>
+            <input type="text" id="username">
+        </div>
+        <div class="inputfield">
+            <label for="rooms">Room:</label>
+            <input list="rooms" id="room" name="custom-select">
+            <datalist id="rooms">
+            </datalist>
+        </div>
+        <button id="join">Join Chat</button>
+    </div>
 </div>
 </body>
 </html>

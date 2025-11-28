@@ -116,3 +116,61 @@ body {
 #sendBtn:hover {
     background: #005c99;
 }
+
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#loginfield{
+    background: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    width: 320px;
+    text-align: center;
+}
+
+.inputfield{
+    position: -webkit-sticky;
+    position: sticky;
+    top:0;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.inputfield label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #555;
+}
+
+.inputfield input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border 0.2s;
+}
+
+button#join {
+    width: 100%;
+    background: #4c8bf5;
+    color: white;
+    border: none;
+    padding: 12px 0;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button#join:hover {
+    background: #3a74d8;
+}
