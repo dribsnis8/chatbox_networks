@@ -6,9 +6,17 @@ const chatSpan = document.querySelector('#chat');
 const input = document.querySelector('#msg');
 const btn = document.querySelector('#sendBtn');
 
-// pour "X is typing..."
-let typingTimeout;
+
+let typingTimeout;               
 const typingIndicator = document.querySelector('#typingIndicator');
+
+
+let typingSent = false;           
+let typingFailSafeTimeout = null;  
+
+/* ============================
+   Helpers message creation
+   ============================ */
 
 function createWhisperMessage(msg) {
   const parts = msg.split(' ');
@@ -34,6 +42,10 @@ function createRegularMessage(msg) {
   };
 }
 
+/* =====================
+   WebSocket : connexion
+   ===================== */
+
 function handleSocketOpen() {
   socket.send(JSON.stringify({
     type: 'joinRoom',
@@ -42,8 +54,19 @@ function handleSocketOpen() {
   }));
 }
 
+/* =====================
+   WebSocket : reception
+   ===================== */
+
 function handleSocketMessage(event) {
-  const { type, username: sender, message, targetUser } = JSON.parse(event.data);
+  const data = JSON.parse(event.data);
+  const { type } = data;
+
+  const sender = data.username;
+  const message = data.message;
+  const targetUser = data.targetUser;
+  const isTyping = data.isTyping;
+
   console.log('RECV:', event.data);
 
   switch (type) {
@@ -70,11 +93,16 @@ function handleSocketMessage(event) {
       appendMessage(`Error: ${message}`, 'error-message');
       break;
 
-    case 'typing':
-      // On ignore si c'est nous
+       case 'typing': {
+     
       if (sender === getUsername()) return;
+      if (!typingIndicator) return;
 
-      if (typingIndicator) {
+      
+      if (isTyping === false) {
+        typingIndicator.textContent = '';
+        clearTimeout(typingTimeout);
+      } else {
         typingIndicator.textContent = `${sender} is typing...`;
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
@@ -82,15 +110,36 @@ function handleSocketMessage(event) {
         }, 1500);
       }
       break;
+    }
+
 
     default:
       console.warn('Unknown type:', type);
   }
 }
 
+/* ======================
+   sending mess
+   ====================== */
+
 function handleSendButtonClick() {
   const msg = input.value.trim();
   if (!msg) return;
+
+ 
+  if (typingSent && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({
+      type: 'typing',
+      username: getUsername(),
+      room: getRoom(),
+      isTyping: false
+    }));
+    typingSent = false;
+    if (typingFailSafeTimeout) {
+      clearTimeout(typingFailSafeTimeout);
+      typingFailSafeTimeout = null;
+    }
+  }
 
   const isWhisper = msg.startsWith('/whisper ');
   const messageData = isWhisper ? createWhisperMessage(msg) : createRegularMessage(msg);
@@ -101,16 +150,58 @@ function handleSendButtonClick() {
   }
 }
 
-// Envoi de l'info "je suis en train d'écrire"
-function sendTyping() {
-  if (socket.readyState !== WebSocket.OPEN) return;
+/* ==========================
+   typing
+   ========================== */
 
-  socket.send(JSON.stringify({
-    type: 'typing',
-    username: getUsername(),
-    room: getRoom()
-  }));
-}
+input.addEventListener('input', () => {
+  const text = input.value;
+
+  // If the user has 3 characters in the textbox then sent a typing
+  if (text.length >= 3 && !typingSent && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({
+      type: 'typing',
+      username: getUsername(),
+      room: getRoom(),
+      isTyping: true
+    }));
+    typingSent = true;
+
+    // Fail-safe 
+    if (typingFailSafeTimeout) clearTimeout(typingFailSafeTimeout);
+    typingFailSafeTimeout = setTimeout(() => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+          type: 'typing',
+          username: getUsername(),
+          room: getRoom(),
+          isTyping: false
+        }));
+      }
+      typingSent = false;
+      typingFailSafeTimeout = null;
+    }, 10000);
+  }
+
+
+  if (text.length === 0 && typingSent && socket.readyState === WebSocket.OPEN) {
+    socket.send(JSON.stringify({
+      type: 'typing',
+      username: getUsername(),
+      room: getRoom(),
+      isTyping: false
+    }));
+    typingSent = false;
+    if (typingFailSafeTimeout) {
+      clearTimeout(typingFailSafeTimeout);
+      typingFailSafeTimeout = null;
+    }
+  }
+});
+
+/* ==========================
+   Wiring  listeners
+   ========================== */
 
 socket.addEventListener('open', handleSocketOpen);
 socket.addEventListener('message', handleSocketMessage);
@@ -118,8 +209,4 @@ btn.addEventListener('click', handleSendButtonClick);
 
 input.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') handleSendButtonClick();
-});
-
-input.addEventListener('input', () => {
-  sendTyping();
 });
