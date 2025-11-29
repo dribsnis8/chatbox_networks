@@ -17,6 +17,8 @@ let typingFailSafeTimeout = null;
 /* ============================
    Helpers message creation
    ============================ */
+const roomName = getRoom(); 
+document.querySelector('#room-title').textContent = `Room: ${roomName}`;
 
 function createWhisperMessage(msg) {
   const parts = msg.split(' ');
