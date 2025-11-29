@@ -7,21 +7,49 @@
     <script src="js/joinRoom.js" type="module" defer></script>
 </head>
 <body>
-<div class="container">
-    <div id="loginfield">
-        <div class="inputfield">
-            <label for="username">Username:</label>
-            <input type="text" id="username">
+<div class="join-wrapper">
+    <div class="join-card">
+        <h1 class="join-title">WebSocket Chat</h1>
+        <p class="join-subtitle">
+            Enter your username and pick (or create) a room to join the chat.
+        </p>
+
+        <div class="join-divider"></div>
+
+        <div class="join-form">
+            <div class="form-row">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="e.g. safia"
+                    required
+                >
+            </div>
+
+            <div class="form-row">
+                <label for="room">Room</label>
+                <input
+                    list="rooms"
+                    id="room"
+                    name="custom-select"
+                    placeholder="e.g. test, group1..."
+                    required
+                >
+                <datalist id="rooms">
+                    <!-- rempli par ton JS -->
+                </datalist>
+            </div>
+
+            <button
+                id="join"
+                type="button"
+                class="join-btn"
+            >
+                Join Chat
+            </button>
         </div>
-        <div class="inputfield">
-            <label for="rooms">Room:</label>
-            <input list="rooms" id="room" name="custom-select">
-            <datalist id="rooms">
-            </datalist>
-        </div>
-        <button id="join">Join Chat</button>
     </div>
 </div>
 </body>
 </html>
-

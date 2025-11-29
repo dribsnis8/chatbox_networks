@@ -58,19 +58,29 @@ function handleSocketData(socket, buffer) {
     }
     const data = JSON.parse(decodeMessage(buffer));
     console.log(data);
-    switch (data.type) {
-      case "Message":
-        broadcast(rooms, data.room, data.message, data.username);
-        break;
-      case "joinRoom":
-        handleJoinRoom(socket, data);
-        break;
-      case "whisper":
-        whisper(rooms, socket, data);
-        break;
-      default:
-        console.warn("Unknown message type:", data.type);
-    }
+  switch (data.type) {
+  case "Message":
+    broadcast(rooms, data.room, data.message, data.username);
+    break;
+
+  case "joinRoom":
+    handleJoinRoom(socket, data);
+    break;
+
+  case "whisper":
+    whisper(rooms, socket, data);
+    break;
+
+  case "typing":
+    // On broadcast un event "typing" à tous les autres dans la même room
+    // message vide, type forcé à "typing"
+    broadcast(rooms, data.room, "", data.username, "typing");
+    break;
+
+  default:
+    console.warn("Unknown message type:", data.type);
+}
+
   } catch (err) {
     console.error("Failed to decode message:", err);
   }
