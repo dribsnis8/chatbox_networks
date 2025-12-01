@@ -1,4 +1,9 @@
-the client makes a request to the server with the a header 'connection: upgrade' to initiate the WebSocket handshake.
+in this project we create a simple WebSocket server using Node.js's built-in `net` module without relying on any external libraries.
+we will handle the WebSocket handshake, message framing, and broadcasting messages to all connected clients manually.
+
+# WebSocket Handshake
+
+when the client makes a request to the server with the a header 'connection: upgrade' to initiate the WebSocket handshake.
 
 ```javascript 
 const socket = new WebSocket('ws://127.0.0.1:3000');
